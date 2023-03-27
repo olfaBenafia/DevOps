@@ -17,14 +17,23 @@ pipeline {
         stage('Cleaning the project') {     
             steps {
                 echo 'cleaning project ...'
-                sh 'mvn clean package'
+                sh 'mvn clean '
+            }
+        }
+        stage('Compile'){
+            steps {
+                sh 'mvn compile -DskipTests'  
             }
         }
         
-        stage('Compiling the artifact') {             
+         stage ("Nexuspackage"){
+			steps{
+			sh "mvn package -DskipTests"          
+            } 
+        }
+        stage('NEXUS') {
             steps {
-                echo "compiling"
-                sh 'mvn compile'
+                sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
             }
         }
         stage ('Docker build') {
