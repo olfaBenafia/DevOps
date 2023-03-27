@@ -70,7 +70,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/x
 <distributionManagement>
 <repository>
 <id>deploymentRepo</id>
-<url>http://192.168.33.10:8081/repository/maven-releases/</url>
+<url>http://172.10.0.140:8081/repository/maven-releases/</url>
 </repository>
 </distributionManagement>
 
