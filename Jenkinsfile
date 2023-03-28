@@ -28,16 +28,16 @@ pipeline {
             }
         }
         
-//          stage ("Nexuspackage"){
-// 			steps{
-// 			sh "mvn package -DskipTests"          
-//             } 
-//         }
-//         stage('NEXUS') {
-//             steps {
-//                 sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
-//             }
-//         }
+          stage ("Nexuspackage"){
+ 			steps{
+ 			sh "mvn package -DskipTests"          
+             } 
+         }
+         stage('NEXUS') {
+             steps {
+                 sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
+             }
+         }
 // 	 stage('SONAR') {
 //             steps {
 //                 sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=olfa1999'
