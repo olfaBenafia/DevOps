@@ -26,16 +26,21 @@ pipeline {
             }
         }
         
-         stage ("Nexuspackage"){
-			steps{
-			sh "mvn package -DskipTests"          
-            } 
-        }
-        stage('NEXUS') {
+//          stage ("Nexuspackage"){
+// 			steps{
+// 			sh "mvn package -DskipTests"          
+//             } 
+//         }
+//         stage('NEXUS') {
+//             steps {
+//                 sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
+//             }
+//         }
+	 stage('SONAR') {
             steps {
-                sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
+                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=sonar'
             }
-        }
+	    
         stage ('Docker build') {
              steps {
             sh ' docker build -t olfabenafia/tpachatproject-1.0:latest .'
