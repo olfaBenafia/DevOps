@@ -17,20 +17,22 @@ pipeline {
         stage('Cleaning the project') {     
             steps {
                 echo 'cleaning project ...'
-                sh 'mvn clean '
-            }
-        }
-        stage('Compile'){
-            steps {
-                sh 'mvn compile -DskipTests'  
+                sh 'mvn clean package'
             }
         }
         
-         stage ("Nexuspackage"){
-			steps{
-			sh "mvn package -DskipTests"          
-            } 
+        stage('Compiling the artifact') {             
+            steps {
+                echo "compiling"
+                sh 'mvn compile'
+            }
         }
+        
+//          stage ("Nexuspackage"){
+// 			steps{
+// 			sh "mvn package -DskipTests"          
+//             } 
+//         }
 //         stage('NEXUS') {
 //             steps {
 //                 sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
