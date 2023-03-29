@@ -9,7 +9,7 @@ services:
     ports:
       - 3306:3306
   app_achat_back:
-    image : khalil1x/tpachatproject-1.0:latest
+    image : kjalleli/tpachatproject-1.0:latest
     depends_on:
       - mysqldatabase
     restart: on-failure
