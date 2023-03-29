@@ -9,9 +9,9 @@ pipeline {
         stage('Checkout GIT') {
             steps {
                 echo 'Pulling... ';
-                    git branch: 'main',
+                    git branch: 'khalil',
                         url : 'https://github.com/olfaBenafia/DevOPs',
-                        credentialsId: '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';
+                        credentialsId: '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';
             }
         }
         stage('Cleaning the project') {     
@@ -29,7 +29,7 @@ pipeline {
         }
         stage ('Docker build') {
              steps {
-            sh ' docker build -t olfabenafia/tpachatproject-1.0:latest .'
+            sh ' docker build -t khalil1x/tpachatproject-1.0:latest .'
             }
         }
         stage ('Docker login'){
@@ -39,7 +39,7 @@ pipeline {
         }
         stage ('Docker push'){
         	steps {
-        	sh 'docker push olfabenafia/tpachatproject-1.0:latest'
+        	sh 'docker push khalil1x/tpachatproject-1.0:latest'
         	}
         }
         stage ('Docker logout'){
