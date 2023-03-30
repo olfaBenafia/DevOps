@@ -11,7 +11,7 @@ pipeline {
                 echo 'Pulling... ';
                     git branch: 'obenafia',
                         url : 'https://github.com/olfaBenafia/DevOPs',
-                        credentialsId: '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';
+                        credentialsId: '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';
             }
         }
         stage('Cleaning the project') {     
