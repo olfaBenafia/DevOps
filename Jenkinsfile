@@ -31,7 +31,8 @@ pipeline {
 }
 pipeline {
   agent any environment {
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub') NEXUS_VERSION = "nexus3"
+    DOCKERHUB_CREDENTIALS = credentials('dockerhub') 
+    NEXUS_VERSION = "nexus3"
     NEXUS_PROTOCOL = "http"
     NEXUS_URL = "172.10.0.140:8081/"
     NEXUS_REPOSITORY = "maven-nexus-repo"
@@ -96,3 +97,4 @@ pipeline {
         }
       }
     }
+  }
