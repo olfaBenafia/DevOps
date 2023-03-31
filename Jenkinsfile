@@ -1,6 +1,14 @@
 pipeline {
     agent any
    
+    environment {
+    DOCKERHUB_CREDENTIALS = credentials('dockerhub') NEXUS_VERSION = "nexus3"
+    NEXUS_PROTOCOL = "http"
+    NEXUS_URL = "172.10.0.140:8081/"
+    NEXUS_REPOSITORY = "maven-nexus-repo"
+    NEXUS_CREDENTIAL_ID = "nexus"
+  }
+    
     stages {
         stage ('Checkout git') {
             steps {
@@ -35,6 +43,33 @@ pipeline {
                 }
             } 
         }
+       stage('BUILD DOCKER IMAGE') {
+      steps {
+        sh ""
+        "docker build -t youssefbs/centos ."
+        ""
+      }
+    }
+    stage('PUSH DOCKER IMAGE') {
+      steps {
+        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW && docker push youssefbs/centos '
+      }
+    }
+    stage(' MVN SONARQUBE') {
+      steps {
+        withSonarQubeEnv('Sonar') {
+          sh 'mvn clean -DskipTests package sonar:sonar'
+        }
+      }
+    }
+    stage('MVN NEXUS') {
+      steps {
+        script {
+          sh 'mvn clean deploy -DskipTests'
+        }
+      }
+    }
+ 
         
     }
 }
