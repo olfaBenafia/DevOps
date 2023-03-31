@@ -27,6 +27,11 @@ pipeline {
                 sh 'mvn compile'
             }
         }
+	    stage('SONAR') {
+            steps {
+                sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=olfa1999'
+            }
+	 }
                 
          stage ("Nexuspackage"){
 			steps{
