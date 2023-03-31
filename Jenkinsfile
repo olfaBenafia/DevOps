@@ -1,53 +1,74 @@
 pipeline {
-    agent any
-   
-    environment {
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub') 
-    NEXUS_VERSION = "nexus3"
+  agent any
+  stages {
+    stage('Unit Test') {
+      steps {
+        sh 'mvn clean test'
+      }
+    }
+    stage('Deploy Standalone') {
+      steps {
+        sh 'mvn deploy -P standalone'
+      }
+    }
+    stage('Deploy AnyPoint') {
+      environment {
+        ANYPOINT_CREDENTIALS = credentials('anypoint.credentials')
+      }
+      steps {
+        sh 'mvn deploy -P arm -Darm.target.name=local-4.0.0-ee -Danypoint.username=${ANYPOINT_CREDENTIALS_USR}  -Danypoint.password=${ANYPOINT_CREDENTIALS_PSW}'
+      }
+    }
+    stage('Deploy CloudHub') {
+      environment {
+        ANYPOINT_CREDENTIALS = credentials('anypoint.credentials')
+      }
+      steps {
+        sh 'mvn deploy -P cloudhub -Dmule.version=4.0.0 -Danypoint.username=${ANYPOINT_CREDENTIALS_USR} -Danypoint.password=${ANYPOINT_CREDENTIALS_PSW}'
+      }
+    }
+  }
+}
+pipeline {
+  agent any environment {
+    DOCKERHUB_CREDENTIALS = credentials('dockerhub') NEXUS_VERSION = "nexus3"
     NEXUS_PROTOCOL = "http"
     NEXUS_URL = "172.10.0.140:8081/"
     NEXUS_REPOSITORY = "maven-nexus-repo"
     NEXUS_CREDENTIAL_ID = "nexus"
   }
-    
-    stages {
-        stage ('Checkout git') {
-            steps {
-                git branch: 'youssef' ,
-                url :'https://github.com/olfaBenafia/DevOpsProject.git'
-            }
-        }
-        stage ('Maven Clean') {
-            steps {
-                sh 'mvn clean'
-            }
-        }
-        stage ('Maven Compile') {
-            steps {
-                sh 'mvn compile'
-            }
-        }
-        stage ('Maven Package') {
-            steps {
-                sh 'mvn package'
-            }
-        }
-        stage ('Unit Test') {
-            steps {
-                sh 'mvn test'
-            }
-        }
-      stage('Building our image') { 
-            steps { 
-                script { 
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
-                }
-            } 
-        }
-       stage('BUILD DOCKER IMAGE') {
+  stages {
+    stage('GIT CHECKOUT') {
       steps {
-        sh 'docker build -t tpachat/centos:1.0'
+        echo 'Pulling ... ';
+        git branch: 'youssef', url: 'https://github.com/olfaBenafia/DevOPs';
       }
+    }
+    stage('TESTING MAVEN') {
+      steps {
+        sh ""
+        " mvn --version"
+        ""
+      }
+    }
+    stage('MAVEN COMPILE') {
+      steps {
+        sh ""
+        "mvn compile"
+        ""
+      }
+    }
+    stage('MAVEN PACKAGE') {
+      steps {
+        sh ""
+        "mvn package"
+        ""
+      }
+    }
+    stage('BUILD DOCKER IMAGE') {
+      steps {
+        sh 'docker build -t tpachat/centos:1.0'   
+   }
     }
     stage('PUSH DOCKER IMAGE') {
       steps {
@@ -68,7 +89,10 @@ pipeline {
         }
       }
     }
- 
-        
+    stage('DOCKER COMPOSE') {
+      steps {
+        script {
+          sh 'docker-compose up -d'
+        }
+      }
     }
-}
