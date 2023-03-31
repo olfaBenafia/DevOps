@@ -1,101 +1,83 @@
 pipeline {
-  agent any
-  stages {
+  environment {
+    registry = "youssefbs/centos"
+    registryCredential = 'dockerHub'
+    dockerImage = ''
+    NEXUS_VERSION = "nexus3"
+    NEXUS_PROTOCAOL = "http"
+    NEXUS_URL = "172.10.0.140:8081"
+    NEXUS_REPOSITORY = "nexus-repo-devops"
+    NEXUS_CREDENTIAL_ID = "deploymentRepo"
+  }
+  agent any stages {
+    stage('Checkout GIT') {
+      steps {
+        git branch: 'youssef', url: 'https://github.com/olfaBenafia/DevOpsProject.git'
+      }
+    }
+    stage('Maven Clean') {
+      steps {
+        sh 'mvn clean'
+      }
+    }
+    stage('Maven Compile') {
+      steps {
+        sh 'mvn compile'
+      }
+    }
+    stage('Maven Package') {
+      steps {
+        sh 'mvn package'
+      }
+    }
     stage('Unit Test') {
       steps {
-        sh 'mvn clean test'
+        sh 'mvn test'
       }
     }
-    stage('Deploy Standalone') {
+    stage('Maven SonarQube') {
       steps {
-        sh 'mvn deploy -P standalone'
+        withSonarQubeEnv('sonar1') {
+          sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=sonar'
+        }
       }
     }
-    stage('Deploy AnyPoint') {
-      environment {
-        ANYPOINT_CREDENTIALS = credentials('anypoint.credentials')
-      }
+    stage("Nexus") {
       steps {
-        sh 'mvn deploy -P arm -Darm.target.name=local-4.0.0-ee -Danypoint.username=${ANYPOINT_CREDENTIALS_USR}  -Danypoint.password=${ANYPOINT_CREDENTIALS_PSW}'
+        script {
+          sh "mvn deploy"
+        }
       }
     }
-    stage('Deploy CloudHub') {
-      environment {
-        ANYPOINT_CREDENTIALS = credentials('anypoint.credentials')
-      }
+    stage('Building our image') {
       steps {
-        sh 'mvn deploy -P cloudhub -Dmule.version=4.0.0 -Danypoint.username=${ANYPOINT_CREDENTIALS_USR} -Danypoint.password=${ANYPOINT_CREDENTIALS_PSW}'
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
+        }
+      }
+    }
+    stage('Deploy our image') {
+      steps {
+        script {
+          docker.withRegistry('', registryCredential) {
+            dockerImage.push()
+          }
+        }
+      }
+    }
+    stage('Docker Compose') {
+      steps {
+        sh ' docker-compose down '
+        sh ' docker-compose up --force-recreate -d'
       }
     }
   }
-}
-pipeline {
-  agent any environment {
-    DOCKERHUB_CREDENTIALS = credentials('dockerhub') 
-    NEXUS_VERSION = "nexus3"
-    NEXUS_PROTOCOL = "http"
-    NEXUS_URL = "172.10.0.140:8081/"
-    NEXUS_REPOSITORY = "maven-nexus-repo"
-    NEXUS_CREDENTIAL_ID = "nexus"
-  }
-  stages {
-    stage('GIT CHECKOUT') {
-      steps {
-        echo 'Pulling ... ';
-        git branch: 'youssef', url: 'https://github.com/olfaBenafia/DevOPs';
-      }
+  post {
+    success {
+      emailext body: "The pipeline has completed successfully", attachLog: true, subject: "Jenkins pipeline completed successfully", to: "youssef.bensaad@esprit.tn"
     }
-    stage('TESTING MAVEN') {
-      steps {
-        sh ""
-        " mvn --version"
-        ""
-      }
-    }
-    stage('MAVEN COMPILE') {
-      steps {
-        sh ""
-        "mvn compile"
-        ""
-      }
-    }
-    stage('MAVEN PACKAGE') {
-      steps {
-        sh ""
-        "mvn package"
-        ""
-      }
-    }
-    stage('BUILD DOCKER IMAGE') {
-      steps {
-        sh 'docker build -t tpachat/centos:1.0'   
-   }
-    }
-    stage('PUSH DOCKER IMAGE') {
-      steps {
-        sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR -p $DOCKERHUB_CREDENTIALS_PSW && docker push youssefbs/centos '
-      }
-    }
-    stage(' MVN SONARQUBE') {
-      steps {
-        withSonarQubeEnv('Sonar') {
-          sh 'mvn clean -DskipTests package sonar:sonar'
-        }
-      }
-    }
-    stage('MVN NEXUS') {
-      steps {
-        script {
-          sh 'mvn clean deploy -DskipTests'
-        }
-      }
-    }
-    stage('DOCKER COMPOSE') {
-      steps {
-        script {
-          sh 'docker-compose up -d'
-        }
-      }
+    failure {
+      emailext body: "The pipeline has failed", attachLog: true, subject: "Jenkins pipeline failed", to: "youssef.bensaad@esprit.tn"
     }
   }
 }
