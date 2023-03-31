@@ -38,11 +38,11 @@ pipeline {
 			sh "mvn package -DskipTests"          
             } 
         }
-        stage('NEXUS') {
-            steps {
-                sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
-            }
-        }
+//         stage('NEXUS') {
+//             steps {
+//                 sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
+//             }
+//         }
         stage ('Docker build') {
              steps {
             sh ' docker build -t khalil1x/tpachatproject-1.0:latest .'
