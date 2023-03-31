@@ -46,7 +46,7 @@ pipeline {
         }
        stage('BUILD DOCKER IMAGE') {
       steps {
-        sh 'docker build -t youssefbs/centos'
+        sh 'docker build -t tpachat/centos:1.0'
       }
     }
     stage('PUSH DOCKER IMAGE') {
