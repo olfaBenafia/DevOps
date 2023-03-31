@@ -9,7 +9,8 @@ pipeline {
     NEXUS_REPOSITORY = "nexus-repo-devops"
     NEXUS_CREDENTIAL_ID = "deploymentRepo"
   }
-  agent any stages {
+  agent any 
+  stages {
     stage('Checkout GIT') {
       steps {
         git branch: 'youssef', url: 'https://github.com/olfaBenafia/DevOpsProject.git'
