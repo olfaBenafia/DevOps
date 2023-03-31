@@ -72,7 +72,7 @@
 		</dependency>
 	</dependencies>
 	<distributionManagement>
-		<url>http://192.168.108.222:8081/repository/maven-releases/</url>
+		<url>http://172.10.0.140:8081/repository/maven-releases/</url>
 	</distributionManagement>
 
 	<build>
