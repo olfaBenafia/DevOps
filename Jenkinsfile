@@ -9,9 +9,9 @@ pipeline {
         stage('Checkout GIT') {
             steps {
                 echo 'Pulling... ';
-                    git branch: 'main',
+                    git branch: 'obenafia',
                         url : 'https://github.com/olfaBenafia/DevOPs',
-                        credentialsId: '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';
+                        credentialsId: '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';
             }
         }
         stage('Cleaning the project') {     
@@ -27,6 +27,23 @@ pipeline {
                 sh 'mvn compile'
             }
         }
+        
+//          stage ("Nexuspackage"){
+// 			steps{
+// 			sh "mvn package -DskipTests"          
+//             } 
+//         }
+//         stage('NEXUS') {
+//             steps {
+//                 sh 'mvn clean deploy -Dmaven.test.skip=true -Dresume=false'
+//             }
+//         }
+// 	 stage('SONAR') {
+//             steps {
+//                 sh 'mvn sonar:sonar -Dsonar.login=admin -Dsonar.password=olfa1999'
+//             }
+// 	 }
+	    
         stage ('Docker build') {
              steps {
             sh ' docker build -t olfabenafia/tpachatproject-1.0:latest .'
